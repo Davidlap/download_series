@@ -9,6 +9,7 @@ This scripts uses a JSON config file, with series you are currently watching, yo
 # How to use it
 
 - Modify series_config.json and add you favorites shows with the release date, then create a schedule job in windows to run the script everyday. Follow naming standard like below
+```json
 {
     "series":{
         "Modern Family":{
@@ -19,5 +20,6 @@ This scripts uses a JSON config file, with series you are currently watching, yo
         }
     }
 }
+```
 
 Enjoy
