@@ -1,0 +1,25 @@
+{
+    "series":{
+        "Brooklyn nine nine":{
+            "release_date": 4
+        },
+        "The good doctor":{
+            "release_date": 2
+        },
+        "The walking dead":{
+            "release_date": 0
+        },
+        "The flash":{
+            "release_date": 2
+        },
+        "Chicago PD":{
+            "release_date": 3
+        },
+        "Modern Family":{
+            "release_date": 3
+        },
+        "Westworld":{
+            "release_date": 5
+        }
+    }
+}
