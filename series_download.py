@@ -4,6 +4,8 @@ import requests
 from bs4 import BeautifulSoup
 import os
 import time
+import sys
+import subprocess
 
 
 def load_series_json():
@@ -21,7 +23,7 @@ def get_episode_for_today(series_file):
     """Gets the episodes that are released today, based on weekday (Monday == 0, Tuesday == 1...)"""
 
     today_number = datetime.datetime.today().weekday()
-    episodes_to_download = { serie: serie_data for serie, serie_data in series_file['series'].items() if serie_data['release_date'] == today_number}
+    episodes_to_download = {serie: serie_data for serie, serie_data in series_file['series'].items() if serie_data['release_date'] == today_number}
     return episodes_to_download
 
 def get_episodes_torrent_data(serie):
@@ -83,10 +85,10 @@ def _get_last_episode_from_api(serie):
         serie_data_json = json.loads(response.content.decode('utf-8'))
         try:
             episodes = serie_data_json['tvShow']['episodes']
-            # today = datetime.date.today().strftime("%Y-%m-%d") #to be uncomented
+            today = datetime.date.today().strftime("%Y-%m-%d") #to be uncomented
             # last_episode = serie_data_json['tvShow']['episodes'][-1]
             for ser_episode in episodes:
-                if '2020-03-18' in ser_episode['air_date']: #Change date for 'today' variablee
+                if today in ser_episode['air_date']: 
                     print(ser_episode)
 
                     if int(ser_episode['season']) < 10:
@@ -121,8 +123,11 @@ def get_magnet_link(link_to_download):
 
 def open_magnet_link(magnet_link):
     """Opens the magnet link with any torrent client installed"""
-
-    os.startfile(magnet_link)
+    if sys.platform.startswith("win"):
+        os.startfile(magnet_link)
+    else:
+        opener ="open" if sys.platform == "darwin" else "xdg-open"
+        subprocess.call([opener, magnet_link])
 
 
 def main():
@@ -137,12 +142,14 @@ def main():
     except KeyError as ex:
         print("Error reading the JSON -->" + str(ex))
 
-    try:
-        if len(episodes_to_download) == 0:
-            print("No episodes for today")
-        else:
-            for serie, data in episodes_to_download.items():
-                
+    
+    if len(episodes_to_download) == 0:
+        print("No episodes for today")
+    else:
+        
+        for serie, data in episodes_to_download.items():
+            try:
+                # print(serie)
                 episodes_torrent_data = get_episodes_torrent_data(serie)
                 print("Maximum torrent with seeds is --- ")
                 max_seeds = max(int(d['seeds']) for d in episodes_torrent_data.values()) #Obtain the most seeded link
@@ -161,9 +168,9 @@ def main():
                 print("Magnet link is: " + magnet_link)
                 open_magnet_link(magnet_link)
 
-    
-    except Exception as ex:
-        print("Unknown error ocurred --> " + str(ex))
+
+            except Exception as ex:
+                print("Unknown error ocurred --> " + str(ex))
 
 
 if __name__ == "__main__":
